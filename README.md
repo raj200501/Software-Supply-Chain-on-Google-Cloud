@@ -18,11 +18,11 @@ Modern teams need verifiable builds, signed artifacts, and policy-gated deploys.
 
 ```mermaid
 flowchart LR
-  A[Dev Push] --> B[Bazel Build and Test (Cloud Build)]
+  A[Dev Push] --> B["Bazel Build and Test (Cloud Build)"]
   B --> C[SBOM (syft)]
   B --> D[SLSA Provenance]
   B --> E[in-toto Links]
-  C --> F[cosign sign + attest (KMS)]
+  C --> F["cosign sign + attest (KMS)"]
   D --> F
   E --> F
   F --> G[Artifact Registry]
