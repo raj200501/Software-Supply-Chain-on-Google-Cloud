@@ -1,0 +1,27 @@
+{
+  "_type": "https://slsa.dev/provenance/v1",
+  "subject": [
+    {
+      "name": "gateway",
+      "digest": {
+        "sha256": "0123456789abcdef"
+      }
+    }
+  ],
+  "predicate": {
+    "buildType": "https://bazel.build",
+    "builder": {
+      "id": "https://cloudbuild.googleapis.com/projects/example/locations/us-central1/builds/123"
+    },
+    "metadata": {
+      "buildInvocationId": "123",
+      "buildStartedOn": "2024-01-01T00:00:00Z"
+    },
+    "recipe": {
+      "type": "bazel",
+      "definedInMaterial": 0,
+      "entryPoint": "//api/gateway:image",
+      "arguments": ["bazel", "build", "//api/gateway:image"]
+    }
+  }
+}

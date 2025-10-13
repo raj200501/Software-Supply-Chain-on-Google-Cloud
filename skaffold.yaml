@@ -1,0 +1,50 @@
+apiVersion: skaffold/v4beta6
+kind: Config
+metadata:
+  name: slsa-bazel-gke-reference
+build:
+  artifacts:
+    - image: gateway
+      docker:
+        dockerfile: api/gateway/Dockerfile
+        buildArgs: {}
+      context: api/gateway
+    - image: users
+      docker:
+        dockerfile: Dockerfile
+      context: services/users
+    - image: orders
+      docker:
+        dockerfile: Dockerfile
+      context: services/orders
+    - image: inventory
+      docker:
+        dockerfile: Dockerfile
+      context: services/inventory
+    - image: payments
+      docker:
+        dockerfile: Dockerfile
+      context: services/payments
+    - image: notifications
+      docker:
+        dockerfile: Dockerfile
+      context: services/notifications
+    - image: web
+      docker:
+        dockerfile: Dockerfile
+      context: apps/web
+  local:
+    push: false
+deploy:
+  kustomize:
+    paths:
+      - infra/k8s/overlays/dev
+profiles:
+  - name: prod
+    build:
+      local:
+        push: true
+    deploy:
+      kustomize:
+        paths:
+          - infra/k8s/overlays/prod

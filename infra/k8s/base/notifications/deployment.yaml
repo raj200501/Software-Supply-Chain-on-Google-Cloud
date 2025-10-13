@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: notifications
+  namespace: supply-chain
+  labels:
+    app: notifications
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: notifications
+  template:
+    metadata:
+      labels:
+        app: notifications
+        app.kubernetes.io/name: notifications
+        app.kubernetes.io/owner: platform
+    spec:
+      containers:
+        - name: notifications
+          image: notifications
+          ports:
+            - containerPort: 8084
+          envFrom:
+            - configMapRef:
+                name: platform-env
+          env:
+            - name: PORT
+              value: "8084"
+            - name: OTEL_SERVICE_NAME
+              value: notifications
+          readinessProbe:
+            httpGet:
+              path: /readyz
+              port: 8084
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 8084
+          resources:
+            requests:
+              cpu: 200m
+              memory: 256Mi
+            limits:
+              cpu: 400m
+              memory: 512Mi

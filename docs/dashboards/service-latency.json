@@ -1,0 +1,14 @@
+{
+  "title": "Service Latency",
+  "panels": [
+    {
+      "type": "timeseries",
+      "title": "Gateway latency",
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.95, sum(rate(http_server_duration_seconds_bucket{service=\"gateway\"}[5m])) by (le))"
+        }
+      ]
+    }
+  ]
+}

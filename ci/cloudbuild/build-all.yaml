@@ -1,0 +1,113 @@
+steps:
+  - name: gcr.io/cloud-builders/gcloud
+    id: "Setup Bazel cache"
+    entrypoint: bash
+    args:
+      - -c
+      - |
+        gcloud auth configure-docker ${_REGION}-docker.pkg.dev -q
+  - name: gcr.io/cloud-builders/bazel
+    id: "Bazel build"
+    args: ["bazel", "build", "//..."]
+  - name: gcr.io/cloud-builders/bazel
+    id: "Bazel test"
+    args: ["bazel", "test", "//..."]
+  - name: gcr.io/cloud-builders/docker
+    id: "Build and push images"
+    entrypoint: bash
+    args:
+      - -c
+      - |
+        for image in gateway users orders inventory payments notifications web; do
+          case "$image" in
+            gateway) context=api/gateway ;;
+            users) context=services/users ;;
+            orders) context=services/orders ;;
+            inventory) context=services/inventory ;;
+            payments) context=services/payments ;;
+            notifications) context=services/notifications ;;
+            web) context=apps/web ;;
+          esac
+          docker build "$context" \
+            -t ${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_ARTIFACT_REGISTRY}/$image:${SHORT_SHA}
+          docker push ${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_ARTIFACT_REGISTRY}/$image:${SHORT_SHA}
+        done
+  - name: gcr.io/cloud-builders/gcloud
+    id: "Generate SBOM"
+    entrypoint: bash
+    args:
+      - -c
+      - |
+        for image in gateway users orders inventory payments notifications web; do
+          ./scripts/generate-sbom.sh \
+            ${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_ARTIFACT_REGISTRY}/$image:${SHORT_SHA} \
+            ${_ATTESTATION_BUCKET} \
+            ${_GUAC_BUCKET_PREFIX}/$image/${SHORT_SHA}
+        done
+  - name: gcr.io/cloud-builders/gcloud
+    id: "Generate provenance"
+    entrypoint: bash
+    args:
+      - -c
+      - |
+        for image in gateway users orders inventory payments notifications web; do
+          ./scripts/generate-provenance.sh \
+            ${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_ARTIFACT_REGISTRY}/$image:${SHORT_SHA} \
+            ${_ATTESTATION_BUCKET} \
+            ${_GUAC_BUCKET_PREFIX}/$image/${SHORT_SHA} \
+            ${_KMS_KEY}
+        done
+  - name: gcr.io/cloud-builders/gcloud
+    id: "Install kustomize"
+    entrypoint: bash
+    args:
+      - -c
+      - |
+        curl -sLo kustomize.tar.gz https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize%2Fv5.3.0/kustomize_v5.3.0_linux_amd64.tar.gz
+        tar -xzf kustomize.tar.gz
+        chmod +x kustomize
+        mv kustomize /usr/local/bin/kustomize
+  - name: gcr.io/cloud-builders/gcloud
+    id: "Publish GUAC manifest"
+    entrypoint: bash
+    args:
+      - -c
+      - |
+        ./scripts/publish-guac.sh --bucket ${_ATTESTATION_BUCKET} --prefix ${_GUAC_BUCKET_PREFIX} --path supply-chain/sbom/out
+  - name: gcr.io/cloud-builders/gcloud
+    id: "Apply kustomize"
+    entrypoint: bash
+    args:
+      - -c
+      - |
+        gcloud container clusters get-credentials ${_CLUSTER_NAME} --region ${_REGION}
+        TMP_DIR=$(mktemp -d)
+        cp -R infra/k8s/overlays/prod "${TMP_DIR}/prod"
+        pushd "${TMP_DIR}/prod"
+        kustomize edit set image gateway=${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_ARTIFACT_REGISTRY}/gateway:${SHORT_SHA}
+        kustomize edit set image users=${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_ARTIFACT_REGISTRY}/users:${SHORT_SHA}
+        kustomize edit set image orders=${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_ARTIFACT_REGISTRY}/orders:${SHORT_SHA}
+        kustomize edit set image inventory=${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_ARTIFACT_REGISTRY}/inventory:${SHORT_SHA}
+        kustomize edit set image payments=${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_ARTIFACT_REGISTRY}/payments:${SHORT_SHA}
+        kustomize edit set image notifications=${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_ARTIFACT_REGISTRY}/notifications:${SHORT_SHA}
+        kustomize edit set image web=${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_ARTIFACT_REGISTRY}/web:${SHORT_SHA}
+        kustomize build . | kubectl apply -f -
+        popd
+        rm -rf "${TMP_DIR}"
+images:
+  - ${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_ARTIFACT_REGISTRY}/gateway:${SHORT_SHA}
+  - ${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_ARTIFACT_REGISTRY}/users:${SHORT_SHA}
+  - ${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_ARTIFACT_REGISTRY}/orders:${SHORT_SHA}
+  - ${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_ARTIFACT_REGISTRY}/inventory:${SHORT_SHA}
+  - ${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_ARTIFACT_REGISTRY}/payments:${SHORT_SHA}
+  - ${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_ARTIFACT_REGISTRY}/notifications:${SHORT_SHA}
+  - ${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_ARTIFACT_REGISTRY}/web:${SHORT_SHA}
+substitutions:
+  _ARTIFACT_REGISTRY: slsa-reference
+  _ATTESTATION_BUCKET: ${PROJECT_ID}-attestations
+  _GUAC_BUCKET_PREFIX: env/prod
+  _KMS_KEY: projects/${PROJECT_ID}/locations/${_REGION}/keyRings/slsa-ref-keyring/cryptoKeys/container-signing
+  _CLUSTER_NAME: slsa-ref-cluster
+options:
+  substitution_option: ALLOW_LOOSE
+  machineType: E2_HIGHCPU_8

@@ -1,0 +1,5 @@
+[output]
+formats = ["cyclonedx-json", "spdx-json"]
+
+[exclude]
+paths = ["/tmp", "/var"]

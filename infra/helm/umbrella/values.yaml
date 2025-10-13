@@ -1,0 +1,49 @@
+global:
+  imageRegistry: us-central1-docker.pkg.dev/project/repo
+  imageTag: latest
+  otelEndpoint: http://otel-collector:4317
+
+gateway:
+  service:
+    type: ClusterIP
+    port: 8080
+  image:
+    repository: gateway
+
+users:
+  image:
+    repository: users
+  service:
+    port: 8081
+
+orders:
+  image:
+    repository: orders
+  service:
+    port: 8082
+
+inventory:
+  image:
+    repository: inventory
+  service:
+    port: 8085
+
+payments:
+  image:
+    repository: payments
+  service:
+    port: 8083
+
+notifications:
+  image:
+    repository: notifications
+  service:
+    port: 8084
+
+web:
+  image:
+    repository: web
+  env:
+    REACT_APP_API_URL: http://gateway:8080
+  service:
+    port: 3000

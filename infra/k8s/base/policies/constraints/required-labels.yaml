@@ -1,0 +1,9 @@
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sRequiredLabels
+metadata:
+  name: required-owner-label
+spec:
+  enforcementAction: deny
+  parameters:
+    labels:
+      - app.kubernetes.io/owner

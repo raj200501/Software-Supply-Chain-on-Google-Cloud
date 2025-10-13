@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: inventory
+  namespace: supply-chain
+  labels:
+    app: inventory
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: inventory
+  template:
+    metadata:
+      labels:
+        app: inventory
+        app.kubernetes.io/name: inventory
+        app.kubernetes.io/owner: platform
+    spec:
+      containers:
+        - name: inventory
+          image: inventory
+          ports:
+            - containerPort: 8081
+          envFrom:
+            - configMapRef:
+                name: platform-env
+          env:
+            - name: OTEL_SERVICE_NAME
+              value: inventory
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: 8081
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: 8081
+          resources:
+            requests:
+              cpu: 300m
+              memory: 512Mi
+            limits:
+              cpu: 600m
+              memory: 1Gi

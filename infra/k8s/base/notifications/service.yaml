@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: notifications
+  namespace: supply-chain
+  labels:
+    app: notifications
+spec:
+  selector:
+    app: notifications
+  ports:
+    - name: http
+      port: 8084
+      targetPort: 8084
+  type: ClusterIP
