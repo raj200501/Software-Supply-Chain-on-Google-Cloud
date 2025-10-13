@@ -1,0 +1,66 @@
+version: '3.9'
+services:
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_PASSWORD: example
+    ports:
+      - "5432:5432"
+  users:
+    build:
+      context: services/users
+    environment:
+      PORT: 8081
+    ports:
+      - "8081:8081"
+  orders:
+    build:
+      context: services/orders
+    ports:
+      - "8082:8082"
+  inventory:
+    build:
+      context: services/inventory
+    ports:
+      - "8085:8081"
+  payments:
+    build:
+      context: services/payments
+    environment:
+      NOTIFICATIONS_URL: http://notifications:8084
+    ports:
+      - "8083:8083"
+  notifications:
+    build:
+      context: services/notifications
+    ports:
+      - "8084:8084"
+  gateway:
+    build:
+      context: .
+      dockerfile: api/gateway/Dockerfile
+    depends_on:
+      - db
+      - users
+      - orders
+      - inventory
+      - payments
+      - notifications
+    environment:
+      DATABASE_URL: postgres://postgres:example@db:5432/postgres?sslmode=disable
+      USERS_URL: http://users:8081
+      ORDERS_URL: http://orders:8082
+      INVENTORY_URL: http://inventory:8081
+      PAYMENTS_URL: http://payments:8083
+      NOTIFICATIONS_URL: http://notifications:8084
+    ports:
+      - "8080:8080"
+  web:
+    build:
+      context: apps/web
+    environment:
+      REACT_APP_API_URL: http://localhost:8080
+    ports:
+      - "3000:3000"
+    depends_on:
+      - gateway

@@ -1,0 +1,21 @@
+load("@rules_nodejs//nodejs:defs.bzl", "nodejs_binary", "nodejs_test")
+
+package(default_visibility = ["//visibility:public"])
+
+nodejs_binary(
+    name = "server",
+    data = [
+        "src/server.js",
+        "package.json",
+    ],
+    entry_point = "services/payments/src/server.js",
+)
+
+nodejs_test(
+    name = "server_test",
+    data = [
+        "src/server.js",
+        "test/server.test.js",
+    ],
+    entry_point = "services/payments/test/server.test.js",
+)

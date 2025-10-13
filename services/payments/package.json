@@ -1,0 +1,10 @@
+{
+  "name": "payments-service",
+  "version": "0.1.0",
+  "description": "Payments microservice implemented in Node.js",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "test": "node --test test/server.test.js"
+  }
+}

@@ -1,0 +1,16 @@
+load("@rules_rust//rust:defs.bzl", "rust_binary")
+
+package(default_visibility = ["//visibility:public"])
+
+rust_binary(
+    name = "notifications_service",
+    srcs = ["src/main.rs"],
+    crate_type = "bin",
+    deps = [
+        "@notifications_crates//:actix-web",
+        "@notifications_crates//:serde",
+        "@notifications_crates//:serde_json",
+        "@notifications_crates//:tokio",
+        "@notifications_crates//:chrono",
+    ],
+)

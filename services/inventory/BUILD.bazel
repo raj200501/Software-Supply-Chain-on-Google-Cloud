@@ -1,0 +1,30 @@
+load("@rules_java//java:defs.bzl", "java_binary", "java_library", "java_test")
+
+package(default_visibility = ["//visibility:public"])
+
+java_library(
+    name = "inventory_lib",
+    srcs = glob(["src/main/java/**/*.java"]),
+    resources = glob(["src/main/resources/**"]),
+    resource_strip_prefix = "services/inventory/src/main/resources",
+    deps = [
+        "@inventory_maven//:org_springframework_boot_spring_boot_starter_web",
+        "@inventory_maven//:org_springframework_boot_spring_boot_starter_actuator",
+    ],
+)
+
+java_binary(
+    name = "inventory_service",
+    main_class = "com.example.inventory.InventoryApplication",
+    runtime_deps = [":inventory_lib"],
+)
+
+java_test(
+    name = "inventory_controller_test",
+    srcs = ["src/test/java/com/example/inventory/InventoryControllerTest.java"],
+    deps = [
+        ":inventory_lib",
+        "@inventory_maven//:org_springframework_boot_spring_boot_starter_test",
+        "@inventory_maven//:org_assertj_assertj_core",
+    ],
+)
