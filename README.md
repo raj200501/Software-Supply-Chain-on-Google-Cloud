@@ -2,7 +2,6 @@
 
 > End-to-end **secure software supply chain** on Google Cloud with **Bazel**, **SLSA L3 provenance**, **SBOMs**, **cosign + KMS**, **Binary Authorization** gates on **GKE**, **in-toto** attestations, **GUAC** supply-chain graphing, **OPA Gatekeeper** policies, **OpenTelemetry** observability, and a **polyglot microservices** app (Go, Python, Java, Node, Rust) + React web UI.
 
-![CI](https://img.shields.io/github/actions/workflow/status/OWNER/slsa-bazel-gke-reference/ci.yml?label=CI)
 ![License](https://img.shields.io/badge/license-Apache--2.0-blue)
 
 ---
@@ -19,31 +18,30 @@ Modern teams need verifiable builds, signed artifacts, and policy-gated deploys.
 
 ```mermaid
 flowchart LR
-  A[Dev Push] --> B[Bazel Build & Test (Cloud Build)]
+  A[Dev push] --> B[Bazel build and test]
   B --> C[SBOM (syft)]
-  B --> D[SLSA Provenance]
-  B --> E[in-toto Links]
+  B --> D[SLSA provenance]
+  B --> E[in-toto links]
   C --> F[cosign sign + attest (KMS)]
   D --> F
   E --> F
   F --> G[Artifact Registry]
-  G -->|Deploy| H[GKE]
-  H -->|Gate| I[Binary Authorization]
-  G --> J[GUAC Ingest]
+  G -->|deploy| H[GKE]
+  H -->|gate| I[Binary Authorization]
+  G --> J[GUAC ingest]
+
   subgraph App
     U[users (Go)] --- O[orders (Python)]
     I2[inventory (Java)] --- P[payments (Node)]
-    N[notifications (Rust)] --- GW[gRPC/REST Gateway]
-    WEB[React/TS Web] --> GW
+    N[notifications (Rust)] --- GW[gRPC/REST gateway]
+    WEB[React/TS web] --> GW
     U <--> DB[(Postgres)]
     O <--> DB
     I2 <--> DB
     P <--> DB
-    N --> OTEL[OTEL Collector]
+    N --> OTEL[OTEL collector]
   end
 ```
-
-> If GitHub doesn't render the diagram: ensure the code block is fenced with ```` ```mermaid ```` exactly, with a blank line before the fence.
 
 ---
 
