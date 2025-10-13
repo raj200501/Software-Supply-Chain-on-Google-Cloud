@@ -9,24 +9,15 @@ import (
 func main() {
 	mux := http.NewServeMux()
 	RegisterHandlers(mux)
+
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "8080"
 	}
+
 	addr := ":" + port
 	log.Printf("gateway listening on %s", addr)
 	if err := http.ListenAndServe(addr, mux); err != nil {
 		log.Fatalf("server exited: %v", err)
 	}
-    "log"
-    "net/http"
-)
-
-func main() {
-    mux := http.NewServeMux()
-    RegisterHandlers(mux)
-    log.Println("gateway listening on :8080")
-    if err := http.ListenAndServe(":8080", mux); err != nil {
-        log.Fatalf("server exited: %v", err)
-    }
 }
