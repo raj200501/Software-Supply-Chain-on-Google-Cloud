@@ -1,0 +1,24 @@
+apiVersion: policy.sigstore.dev/v1alpha1
+kind: ClusterImagePolicy
+metadata:
+  name: slsa-bazel-gke-reference
+spec:
+  images:
+    - glob: "us-central1-docker.pkg.dev/*"
+  authorities:
+    - name: cosign-kms
+      key:
+        kms: "gcpkms://projects/${PROJECT_ID}/locations/${REGION}/keyRings/slsa-ref-keyring/cryptoKeys/container-signing"
+      ctlog:
+        url: https://rekor.sigstore.dev
+  attestations:
+    - name: slsa-provenance
+      predicateType: https://slsa.dev/provenance/v1
+      policy:
+        type: cue
+        data: |
+          predicateType: "https://slsa.dev/provenance/v1"
+          predicate: {
+            buildType: "https://bazel.build"
+            builder.id: =~"cloud-build"
+          }

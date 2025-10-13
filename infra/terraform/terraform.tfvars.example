@@ -1,0 +1,8 @@
+project_id              = "your-gcp-project"
+region                  = "us-central1"
+artifact_registry_repo  = "slsa-reference"
+attestation_bucket      = "your-attestation-bucket"
+guac_bucket_prefix      = "env/dev"
+gke_release_channel     = "REGULAR"
+db_password             = "change-me"
+notifications_token     = "change-me-token"

@@ -6,39 +6,78 @@ services:
       POSTGRES_PASSWORD: example
     ports:
       - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+  otel-collector:
+    image: otel/opentelemetry-collector:0.89.0
+    command: ["--config=/conf/otel-collector-config.yaml"]
+    volumes:
+      - ./infra/k8s/base/config/otel-collector-config.yaml:/conf/otel-collector-config.yaml:ro
+    ports:
+      - "4317:4317"
+      - "4318:4318"
+      - "9464:9464"
   users:
     build:
       context: services/users
     environment:
       PORT: 8081
+      DATABASE_URL: postgres://postgres:example@db:5432/postgres?sslmode=disable
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4317
+    depends_on:
+      - db
+      - otel-collector
     ports:
       - "8081:8081"
   orders:
     build:
       context: services/orders
+    environment:
+      PORT: 8082
+      USERS_URL: http://users:8081
+      INVENTORY_URL: http://inventory:8085
+      PAYMENTS_URL: http://payments:8083
+      DATABASE_URL: postgres://postgres:example@db:5432/postgres?sslmode=disable
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4317
+    depends_on:
+      - users
+      - inventory
+      - payments
     ports:
       - "8082:8082"
   inventory:
     build:
       context: services/inventory
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/postgres
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: example
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4317
+    depends_on:
+      - db
     ports:
       - "8085:8081"
   payments:
     build:
       context: services/payments
     environment:
+      PORT: 8083
       NOTIFICATIONS_URL: http://notifications:8084
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4317
     ports:
       - "8083:8083"
   notifications:
     build:
       context: services/notifications
+    environment:
+      PORT: 8084
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4317
     ports:
       - "8084:8084"
   gateway:
     build:
-      context: .
-      dockerfile: api/gateway/Dockerfile
+      context: api/gateway
+      dockerfile: Dockerfile
     depends_on:
       - db
       - users
@@ -50,11 +89,10 @@ services:
       DATABASE_URL: postgres://postgres:example@db:5432/postgres?sslmode=disable
       USERS_URL: http://users:8081
       ORDERS_URL: http://orders:8082
-      INVENTORY_URL: http://inventory:8081
+      INVENTORY_URL: http://inventory:8085
       PAYMENTS_URL: http://payments:8083
       NOTIFICATIONS_URL: http://notifications:8084
-    environment:
-      DATABASE_URL: postgres://postgres:example@db:5432/postgres?sslmode=disable
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4317
     ports:
       - "8080:8080"
   web:
@@ -66,3 +104,10 @@ services:
       - "3000:3000"
     depends_on:
       - gateway
+  guac:
+    image: ghcr.io/guacsec/guac:0.1.4
+    command: ["guac", "graphql"]
+    ports:
+      - "8088:8080"
+volumes:
+  postgres-data:

@@ -1,0 +1,10 @@
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sAllowedRegistry
+metadata:
+  name: allowed-registry
+spec:
+  enforcementAction: deny
+  parameters:
+    prefixes:
+      - "us-central1-docker.pkg.dev"
+      - "gcr.io"

@@ -1,0 +1,10 @@
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sRequiredProvenance
+metadata:
+  name: required-provenance
+spec:
+  enforcementAction: deny
+  parameters:
+    annotations:
+      - binaryauthorization.googleapis.com/attestation-name
+      - slsa.dev/provenance

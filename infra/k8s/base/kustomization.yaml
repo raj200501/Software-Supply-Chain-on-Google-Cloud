@@ -1,0 +1,44 @@
+namespace: supply-chain
+resources:
+  - namespace.yaml
+  - config/otel-collector-config.yaml
+  - config/env-configmap.yaml
+  - postgres/postgres.yaml
+  - gateway/deployment.yaml
+  - gateway/service.yaml
+  - users/deployment.yaml
+  - users/service.yaml
+  - orders/deployment.yaml
+  - orders/service.yaml
+  - inventory/deployment.yaml
+  - inventory/service.yaml
+  - payments/deployment.yaml
+  - payments/service.yaml
+  - notifications/deployment.yaml
+  - notifications/service.yaml
+  - web/deployment.yaml
+  - web/service.yaml
+  - otel/collector.yaml
+  - guac/deployment.yaml
+  - monitoring/servicemonitors.yaml
+  - monitoring/alerting-rules.yaml
+  - policies/templates/allowed-registry.yaml
+  - policies/templates/required-labels.yaml
+  - policies/templates/resource-limits.yaml
+  - policies/templates/disallow-latest.yaml
+  - policies/templates/required-provenance.yaml
+  - policies/constraints/allowed-registry.yaml
+  - policies/constraints/required-labels.yaml
+  - policies/constraints/resource-limits.yaml
+  - policies/constraints/disallow-latest.yaml
+  - policies/constraints/required-provenance.yaml
+configMapGenerator:
+  - name: gateway-config
+    files:
+      - gateway/config.yaml
+generatorOptions:
+  disableNameSuffixHash: true
+secretGenerator:
+  - name: db-credentials
+    literals:
+      - password=example

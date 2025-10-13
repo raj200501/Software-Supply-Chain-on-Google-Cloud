@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "payments.fullname" . }}
+  labels:
+    app: {{ include "payments.name" . }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ include "payments.name" . }}
+  template:
+    metadata:
+      labels:
+        app: {{ include "payments.name" . }}
+    spec:
+{{- $global := default (dict "imageRegistry" "" "imageTag" .Values.image.tag "otelEndpoint" "") .Values.global }}
+      containers:
+        - name: payments
+          image: {{ printf "%s/%s:%s" (default $global.imageRegistry "") .Values.image.repository (default .Values.image.tag $global.imageTag) | trimPrefix "/" }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - containerPort: {{ .Values.service.port }}
+          env:
+{{- $env := merge .Values.env (dict "OTEL_EXPORTER_OTLP_ENDPOINT" (default "" $global.otelEndpoint)) }}
+{{- range $key, $value := $env }}
+            - name: {{ $key }}
+              value: "{{ $value }}"
+{{- end }}
+          readinessProbe:
+            httpGet:
+              path: /readyz
+              port: {{ .Values.service.port }}
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: {{ .Values.service.port }}
+          resources: {{- toYaml .Values.resources | nindent 10 }}

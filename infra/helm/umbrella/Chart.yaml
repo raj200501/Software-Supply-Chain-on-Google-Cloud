@@ -1,0 +1,26 @@
+apiVersion: v2
+name: slsa-bazel-gke-reference
+version: 0.1.0
+description: Umbrella chart for the SLSA Bazel GKE reference implementation
+dependencies:
+  - name: gateway
+    version: 0.1.0
+    repository: "file://charts/gateway"
+  - name: users
+    version: 0.1.0
+    repository: "file://charts/users"
+  - name: orders
+    version: 0.1.0
+    repository: "file://charts/orders"
+  - name: inventory
+    version: 0.1.0
+    repository: "file://charts/inventory"
+  - name: payments
+    version: 0.1.0
+    repository: "file://charts/payments"
+  - name: notifications
+    version: 0.1.0
+    repository: "file://charts/notifications"
+  - name: web
+    version: 0.1.0
+    repository: "file://charts/web"

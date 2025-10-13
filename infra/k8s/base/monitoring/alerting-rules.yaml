@@ -1,0 +1,30 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: slsa-reference-rules
+  namespace: supply-chain
+spec:
+  groups:
+    - name: slsa-reference
+      rules:
+        - alert: HighErrorRate
+          expr: sum(rate(http_server_requests_total{status=~"5.."}[5m])) by (service) > 5
+          for: 5m
+          labels:
+            severity: critical
+          annotations:
+            summary: "{{ $labels.service }} error rate high"
+        - alert: GuacIngestionLag
+          expr: guac_ingest_duration_seconds > 60
+          for: 10m
+          labels:
+            severity: warning
+          annotations:
+            summary: "GUAC ingestion is taking longer than expected"
+        - alert: BinaryAuthorizationDenied
+          expr: increase(binary_authorization_denials_total[10m]) > 0
+          for: 0m
+          labels:
+            severity: critical
+          annotations:
+            summary: "Binary Authorization denied an image"

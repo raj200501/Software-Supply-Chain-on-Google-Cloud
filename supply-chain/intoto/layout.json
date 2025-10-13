@@ -1,0 +1,27 @@
+{
+  "_type": "layout",
+  "steps": [
+    {
+      "name": "build",
+      "expected_command": ["bazel", "build", "//..."]
+    },
+    {
+      "name": "test",
+      "expected_command": ["bazel", "test", "//..."]
+    },
+    {
+      "name": "sbom",
+      "expected_command": ["scripts/generate-sbom.sh"]
+    },
+    {
+      "name": "sign",
+      "expected_command": ["cosign", "sign"]
+    }
+  ],
+  "inspect": [
+    {
+      "name": "verify-provenance",
+      "expected_command": ["python", "supply-chain/slsa/verify.py", "provenance.json"]
+    }
+  ]
+}

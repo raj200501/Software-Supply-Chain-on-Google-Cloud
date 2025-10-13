@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: orders
+  namespace: supply-chain
+  labels:
+    app: orders
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: orders
+  template:
+    metadata:
+      labels:
+        app: orders
+        app.kubernetes.io/name: orders
+        app.kubernetes.io/owner: platform
+    spec:
+      containers:
+        - name: orders
+          image: orders
+          ports:
+            - containerPort: 8082
+          envFrom:
+            - configMapRef:
+                name: platform-env
+          env:
+            - name: PORT
+              value: "8082"
+            - name: OTEL_SERVICE_NAME
+              value: orders
+          readinessProbe:
+            httpGet:
+              path: /readyz
+              port: 8082
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 8082
+          resources:
+            requests:
+              cpu: 200m
+              memory: 256Mi
+            limits:
+              cpu: 400m
+              memory: 512Mi

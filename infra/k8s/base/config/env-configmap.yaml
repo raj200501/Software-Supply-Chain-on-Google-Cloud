@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: platform-env
+  namespace: supply-chain
+data:
+  DATABASE_URL: "postgres://postgres:example@postgres:5432/postgres?sslmode=disable"
+  USERS_SERVICE_URL: "http://users:8081"
+  ORDERS_SERVICE_URL: "http://orders:8082"
+  INVENTORY_SERVICE_URL: "http://inventory:8085"
+  PAYMENTS_SERVICE_URL: "http://payments:8083"
+  NOTIFICATIONS_SERVICE_URL: "http://notifications:8084"
+  OTEL_EXPORTER_OTLP_ENDPOINT: "http://otel-collector:4317"
+  GUAC_INGEST_URL: "http://guac-ingest:8080"
+  GUAC_BUCKET: "gs://attestations"

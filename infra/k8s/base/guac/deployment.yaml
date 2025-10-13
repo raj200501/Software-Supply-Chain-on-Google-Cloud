@@ -1,0 +1,73 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: guac-graph
+  namespace: supply-chain
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: guac-graph
+  template:
+    metadata:
+      labels:
+        app: guac-graph
+    spec:
+      containers:
+        - name: graph
+          image: ghcr.io/guacsec/guac:0.1.4
+          args: ["guac", "graphql"]
+          ports:
+            - containerPort: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: guac-graph
+  namespace: supply-chain
+spec:
+  selector:
+    app: guac-graph
+  ports:
+    - port: 8080
+      targetPort: 8080
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: guac-ingest
+  namespace: supply-chain
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: guac-ingest
+  template:
+    metadata:
+      labels:
+        app: guac-ingest
+    spec:
+      containers:
+        - name: ingest
+          image: ghcr.io/guacsec/guac:0.1.4
+          args: ["guac", "collect", "--bucket", "$(GUAC_BUCKET)"]
+          env:
+            - name: GUAC_BUCKET
+              valueFrom:
+                configMapKeyRef:
+                  name: platform-env
+                  key: GUAC_BUCKET
+          ports:
+            - containerPort: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: guac-ingest
+  namespace: supply-chain
+spec:
+  selector:
+    app: guac-ingest
+  ports:
+    - port: 8080
+      targetPort: 8080

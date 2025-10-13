@@ -1,0 +1,10 @@
+image:
+  repository: example
+  tag: latest
+  pullPolicy: IfNotPresent
+service:
+  type: ClusterIP
+  port: 3000
+env: {}
+resources: {}
+replicaCount: 2

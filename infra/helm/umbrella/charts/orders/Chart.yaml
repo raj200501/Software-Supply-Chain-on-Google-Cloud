@@ -1,0 +1,4 @@
+apiVersion: v2
+name: orders
+version: 0.1.0
+description: orders service

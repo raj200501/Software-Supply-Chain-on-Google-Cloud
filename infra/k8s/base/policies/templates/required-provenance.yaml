@@ -1,0 +1,34 @@
+apiVersion: templates.gatekeeper.sh/v1beta1
+kind: ConstraintTemplate
+metadata:
+  name: k8srequiredprovenance
+spec:
+  crd:
+    spec:
+      names:
+        kind: K8sRequiredProvenance
+      validation:
+        openAPIV3Schema:
+          properties:
+            annotations:
+              type: array
+              items:
+                type: string
+  targets:
+    - target: admission.k8s.gatekeeper.sh
+      rego: |
+        package k8srequiredprovenance
+
+        violation[{"msg": msg}] {
+          annotation := input.parameters.annotations[_]
+          not has_annotation(annotation)
+          msg := sprintf("missing required provenance annotation %s", [annotation])
+        }
+
+        has_annotation(annotation) {
+          input.review.object.metadata.annotations[annotation]
+        }
+
+        has_annotation(annotation) {
+          input.review.object.spec.template.metadata.annotations[annotation]
+        }

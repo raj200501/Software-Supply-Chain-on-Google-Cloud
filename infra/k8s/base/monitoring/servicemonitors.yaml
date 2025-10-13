@@ -1,0 +1,33 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: otel-collector
+  namespace: supply-chain
+spec:
+  selector:
+    matchLabels:
+      app: otel-collector
+  namespaceSelector:
+    matchNames:
+      - supply-chain
+  endpoints:
+    - port: metrics
+      interval: 30s
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: services
+  namespace: supply-chain
+spec:
+  selector:
+    matchExpressions:
+      - key: app.kubernetes.io/name
+        operator: Exists
+  namespaceSelector:
+    matchNames:
+      - supply-chain
+  endpoints:
+    - port: http
+      interval: 30s
+      path: /metrics
