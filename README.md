@@ -45,7 +45,23 @@ flowchart LR
   N[notifications Rust] --> GW
   N --> OTEL[OTEL collector]
 ```
-
+```mermaid
+graph TD
+    Web[React SPA] -->|REST| Gateway
+    Gateway -->|gRPC| Users
+    Gateway -->|gRPC| Orders
+    Gateway -->|gRPC| Inventory
+    Gateway -->|gRPC| Payments
+    Gateway -->|gRPC| Notifications
+    subgraph Observability
+        Otel[OTel Collector]
+    end
+    Users --> Otel
+    Orders --> Otel
+    Inventory --> Otel
+    Payments --> Otel
+    Notifications --> Otel
+```
 ---
 
 ## What’s inside
