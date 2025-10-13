@@ -1,0 +1,7 @@
+steps:
+  - name: gcr.io/cloud-builders/bazel
+    args: ["build", "//api/gateway:gateway"]
+  - name: gcr.io/cloud-builders/docker
+    args: ["build", "-t", "gcr.io/$PROJECT_ID/gateway:latest", "-f", "api/gateway/Dockerfile", "."]
+images:
+  - gcr.io/$PROJECT_ID/gateway:latest

@@ -1,0 +1,11 @@
+load("@bazel_gazelle//:def.bzl", "gazelle" )
+
+# Keep build files in sync
+
+filegroup(
+    name = "repo_files",
+    srcs = glob(["**"], exclude = ["bazel-*", "**/.git/**"]),
+    visibility = ["//visibility:private"],
+)
+
+gazelle(name = "update")

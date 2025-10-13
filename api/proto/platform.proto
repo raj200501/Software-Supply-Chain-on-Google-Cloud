@@ -1,0 +1,43 @@
+syntax = "proto3";
+
+package platform.v1;
+
+option go_package = "github.com/example/slsa-bazel-gke-reference/api/gen/platform/v1;platformv1";
+
+message User {
+  string id = 1;
+  string email = 2;
+}
+
+message Order {
+  string id = 1;
+  string user_id = 2;
+  string item_id = 3;
+  double total = 4;
+}
+
+message CreateUserRequest {
+  string email = 1;
+}
+
+message CreateUserResponse {
+  User user = 1;
+}
+
+message CreateOrderRequest {
+  string user_id = 1;
+  string item_id = 2;
+  double total = 3;
+}
+
+message CreateOrderResponse {
+  Order order = 1;
+}
+
+service UsersService {
+  rpc CreateUser(CreateUserRequest) returns (CreateUserResponse);
+}
+
+service OrdersService {
+  rpc CreateOrder(CreateOrderRequest) returns (CreateOrderResponse);
+}
