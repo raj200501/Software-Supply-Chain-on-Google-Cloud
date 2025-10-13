@@ -19,28 +19,31 @@ Modern teams need verifiable builds, signed artifacts, and policy-gated deploys.
 ```mermaid
 flowchart LR
   A[Dev push] --> B[Bazel build and test]
-  B --> C[SBOM (syft)]
+  B --> C[SBOM syft]
   B --> D[SLSA provenance]
-  B --> E[in-toto links]
-  C --> F[cosign sign + attest (KMS)]
+  B --> E[intoto links]
+  C --> F[cosign sign and attest KMS]
   D --> F
   E --> F
   F --> G[Artifact Registry]
-  G -->|deploy| H[GKE]
-  H -->|gate| I[Binary Authorization]
+  G --> H[GKE]
+  H --> I[Binary Authorization gate]
   G --> J[GUAC ingest]
+```
 
-  subgraph App
-    U[users (Go)] --- O[orders (Python)]
-    I2[inventory (Java)] --- P[payments (Node)]
-    N[notifications (Rust)] --- GW[gRPC/REST gateway]
-    WEB[React/TS web] --> GW
-    U <--> DB[(Postgres)]
-    O <--> DB
-    I2 <--> DB
-    P <--> DB
-    N --> OTEL[OTEL collector]
-  end
+```mermaid
+flowchart LR
+  WEB[React TS web] --> GW[gRPC REST gateway]
+  GW --> U[users Go]
+  GW --> O[orders Python]
+  GW --> I2[inventory Java]
+  GW --> P[payments Node]
+  U --> DB[Postgres]
+  O --> DB
+  I2 --> DB
+  P --> DB
+  N[notifications Rust] --> GW
+  N --> OTEL[OTEL collector]
 ```
 
 ---
