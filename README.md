@@ -2,6 +2,7 @@
 
 > End-to-end **secure software supply chain** on Google Cloud with **Bazel**, **SLSA L3 provenance**, **SBOMs**, **cosign + KMS**, **Binary Authorization** gates on **GKE**, **in-toto** attestations, **GUAC** supply-chain graphing, **OPA Gatekeeper** policies, **OpenTelemetry** observability, and a **polyglot microservices** app (Go, Python, Java, Node, Rust) + React web UI.
 
+![CI](https://img.shields.io/github/actions/workflow/status/OWNER/slsa-bazel-gke-reference/ci.yml?label=CI)
 ![License](https://img.shields.io/badge/license-Apache--2.0-blue)
 
 ---
@@ -18,11 +19,11 @@ Modern teams need verifiable builds, signed artifacts, and policy-gated deploys.
 
 ```mermaid
 flowchart LR
-  A[Dev Push] --> B["Bazel Build and Test (Cloud Build)"]
+  A[Dev Push] --> B[Bazel Build & Test (Cloud Build)]
   B --> C[SBOM (syft)]
   B --> D[SLSA Provenance]
   B --> E[in-toto Links]
-  C --> F["cosign sign + attest (KMS)"]
+  C --> F[cosign sign + attest (KMS)]
   D --> F
   E --> F
   F --> G[Artifact Registry]
@@ -41,6 +42,8 @@ flowchart LR
     N --> OTEL[OTEL Collector]
   end
 ```
+
+> If GitHub doesn't render the diagram: ensure the code block is fenced with ```` ```mermaid ```` exactly, with a blank line before the fence.
 
 ---
 
@@ -104,10 +107,10 @@ helm upgrade --install app infra/helm/umbrella -n app --create-namespace
 
 ```bash
 # Generate SBOM locally for an image
-make sbom IMAGE=us-central1-docker.pkg.dev/$PROJECT/app/users:$(git rev-parse -- short HEAD)
+make sbom IMAGE=us-central1-docker.pkg.dev/$PROJECT/app/users:$(git rev-parse --short HEAD)
 
 # Verify signature + SLSA provenance
-make verify IMAGE=us-central1-docker.pkg.dev/$PROJECT/app/users:$(git rev-parse -- short HEAD)
+make verify IMAGE=us-central1-docker.pkg.dev/$PROJECT/app/users:$(git rev-parse --short HEAD)
 ```
 
 - **Binary Authorization** enforces: only **signed** images with **valid SLSA provenance** can run on GKE.
@@ -200,3 +203,7 @@ PRs welcome! Please run `bazel test //...` and `make e2e` before pushing.
 ## License
 
 [Apache-2.0](./LICENSE)
+
+---
+
+> **Replace `OWNER` in the CI badge URL with your GitHub handle or org.**
