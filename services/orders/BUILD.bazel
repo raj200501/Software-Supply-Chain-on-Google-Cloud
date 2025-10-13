@@ -1,0 +1,22 @@
+load("@rules_python//python:defs.bzl", "py_binary", "py_library", "py_test")
+
+package(default_visibility = ["//visibility:public"])
+
+py_library(
+    name = "app_lib",
+    srcs = ["app/main.py"],
+    deps = ["@orders_requirements//:fastapi"],
+)
+
+py_binary(
+    name = "server",
+    srcs = ["app/main.py"],
+    main = "app/main.py",
+    deps = ["@orders_requirements//:fastapi", "@orders_requirements//:uvicorn"],
+)
+
+py_test(
+    name = "app_test",
+    srcs = ["app/test_main.py"],
+    deps = ["@orders_requirements//:fastapi", "@orders_requirements//:pydantic", "@orders_requirements//:pytest"],
+)

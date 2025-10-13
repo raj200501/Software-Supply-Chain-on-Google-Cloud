@@ -7,6 +7,14 @@ option go_package = "github.com/example/slsa-bazel-gke-reference/api/gen/platfor
 message User {
   string id = 1;
   string email = 2;
+  string name = 3;
+}
+
+message InventoryItem {
+  string id = 1;
+  string sku = 2;
+  string name = 3;
+  int32 quantity = 4;
 }
 
 message Order {
@@ -14,10 +22,25 @@ message Order {
   string user_id = 2;
   string item_id = 3;
   double total = 4;
+  string status = 5;
+}
+
+message Payment {
+  string id = 1;
+  string order_id = 2;
+  double amount = 3;
+  string status = 4;
+}
+
+message Notification {
+  string id = 1;
+  string user_id = 2;
+  string message = 3;
 }
 
 message CreateUserRequest {
   string email = 1;
+  string name = 2;
 }
 
 message CreateUserResponse {
@@ -34,10 +57,49 @@ message CreateOrderResponse {
   Order order = 1;
 }
 
+message ReserveInventoryRequest {
+  string item_id = 1;
+  int32 quantity = 2;
+}
+
+message ReserveInventoryResponse {
+  InventoryItem item = 1;
+}
+
+message CapturePaymentRequest {
+  string order_id = 1;
+  double amount = 2;
+}
+
+message CapturePaymentResponse {
+  Payment payment = 1;
+}
+
+message SendNotificationRequest {
+  string user_id = 1;
+  string message = 2;
+}
+
+message SendNotificationResponse {
+  Notification notification = 1;
+}
+
 service UsersService {
   rpc CreateUser(CreateUserRequest) returns (CreateUserResponse);
 }
 
 service OrdersService {
   rpc CreateOrder(CreateOrderRequest) returns (CreateOrderResponse);
+}
+
+service InventoryService {
+  rpc Reserve(ReserveInventoryRequest) returns (ReserveInventoryResponse);
+}
+
+service PaymentsService {
+  rpc Capture(CapturePaymentRequest) returns (CapturePaymentResponse);
+}
+
+service NotificationsService {
+  rpc Send(SendNotificationRequest) returns (SendNotificationResponse);
 }
