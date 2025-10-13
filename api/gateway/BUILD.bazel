@@ -1,0 +1,23 @@
+load("@rules_go//go:def.bzl", "go_binary", "go_library", "go_test")
+
+go_library(
+    name = "gateway_lib",
+    srcs = [
+        "handlers.go",
+    ],
+    importpath = "github.com/example/slsa-bazel-gke-reference/api/gateway",
+    visibility = ["//visibility:private"],
+)
+
+go_binary(
+    name = "gateway",
+    srcs = ["main.go"],
+    embed = [":gateway_lib"],
+    visibility = ["//visibility:public"],
+)
+
+go_test(
+    name = "gateway_test",
+    srcs = ["handlers_test.go"],
+    embed = [":gateway_lib"],
+)

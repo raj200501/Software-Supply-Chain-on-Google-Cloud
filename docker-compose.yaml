@@ -1,0 +1,27 @@
+version: '3.9'
+services:
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_PASSWORD: example
+    ports:
+      - "5432:5432"
+  gateway:
+    build:
+      context: .
+      dockerfile: api/gateway/Dockerfile
+    depends_on:
+      - db
+    environment:
+      DATABASE_URL: postgres://postgres:example@db:5432/postgres?sslmode=disable
+    ports:
+      - "8080:8080"
+  web:
+    build:
+      context: apps/web
+    environment:
+      REACT_APP_API_URL: http://localhost:8080
+    ports:
+      - "3000:3000"
+    depends_on:
+      - gateway

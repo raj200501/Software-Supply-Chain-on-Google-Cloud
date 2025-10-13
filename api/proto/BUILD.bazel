@@ -1,0 +1,7 @@
+load("@bazel_tools//tools/build_defs/proto:proto.bzl", "proto_library")
+
+proto_library(
+    name = "platform_proto",
+    srcs = ["platform.proto"],
+    visibility = ["//visibility:public"],
+)

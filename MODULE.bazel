@@ -1,0 +1,4 @@
+module(name = "slsa_bazel_gke_reference", version = "0.1.0")
+
+go_sdk = use_extension("@rules_go//go:extensions.bzl", "go_sdk")
+go_sdk.download(version = "1.21.5")

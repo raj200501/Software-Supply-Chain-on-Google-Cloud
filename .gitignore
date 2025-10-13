@@ -1,0 +1,6 @@
+node_modules/
+.DS_Store
+bazel-*
+*.pyc
+__pycache__/
+.env
