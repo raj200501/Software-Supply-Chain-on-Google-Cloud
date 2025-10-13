@@ -53,6 +53,8 @@ services:
       INVENTORY_URL: http://inventory:8081
       PAYMENTS_URL: http://payments:8083
       NOTIFICATIONS_URL: http://notifications:8084
+    environment:
+      DATABASE_URL: postgres://postgres:example@db:5432/postgres?sslmode=disable
     ports:
       - "8080:8080"
   web:

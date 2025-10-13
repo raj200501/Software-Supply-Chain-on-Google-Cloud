@@ -20,6 +20,9 @@ func TestHealthz(t *testing.T) {
 func TestCreateUser(t *testing.T) {
     handler := New()
     req := httptest.NewRequest(http.MethodPost, "/users", bytes.NewBufferString(`{"email":"test@example.com","name":"Tester"}`))
+func TestCreateUser(t *testing.T) {
+    handler := New()
+    req := httptest.NewRequest(http.MethodPost, "/users", bytes.NewBufferString(`{"email":"test@example.com"}`))
     rr := httptest.NewRecorder()
     handler.ServeHTTP(rr, req)
 

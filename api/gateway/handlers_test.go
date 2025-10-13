@@ -35,6 +35,10 @@ func TestCreateOrderRoute(t *testing.T) {
     mux := http.NewServeMux()
     RegisterHandlers(mux)
     req := httptest.NewRequest(http.MethodPost, "/api/orders", bytes.NewBufferString(`{"userId":"user-1","itemId":"item-1","total":25.0}`))
+func TestCreateUserRoute(t *testing.T) {
+    mux := http.NewServeMux()
+    RegisterHandlers(mux)
+    req := httptest.NewRequest(http.MethodPost, "/api/users", bytes.NewBufferString(`{"email":"test@example.com"}`))
     rr := httptest.NewRecorder()
     mux.ServeHTTP(rr, req)
     if rr.Code != http.StatusOK {
