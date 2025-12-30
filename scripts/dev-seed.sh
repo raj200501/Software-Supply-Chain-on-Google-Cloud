@@ -12,7 +12,7 @@ function create_user() {
 function create_order() {
   curl -sS -X POST "${GATEWAY_URL}/v1/orders" \
     -H 'Content-Type: application/json' \
-    -d '{"user_id":1,"item":"starter-kit","quantity":1}'
+    -d '{"userId":"user-1","itemId":"starter-kit","quantity":1,"total":25.00}'
 }
 
 function list_inventory() {
