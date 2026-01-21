@@ -55,7 +55,7 @@ Before deploying a new release you can verify the provenance locally:
   --attestor "projects/${PROJECT_ID}/attestors/slsa-attestor"
 ```
 
-The script downloads the provenance, validates the signature, and checks that the build command references Bazel targets. Any failure aborts the deployment.
+The script downloads the provenance, validates the signature, and checks that the build command references Bazel targets.
 
 ## Updating policies
 

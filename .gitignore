@@ -5,3 +5,6 @@ bazel-*
 __pycache__/
 .env
 supply-chain/sbom/out/
+
+# Local Codex notes
+codex_notes/
