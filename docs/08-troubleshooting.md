@@ -14,18 +14,6 @@ This document enumerates common issues encountered when working with the reposit
 - Install required toolchains (Go, Python, Java, Node, Rust) using `make deps`.
 - Verify you are using Bazelisk (it automatically selects the correct Bazel version).
 
-## Terraform authentication failures
-
-- Run `gcloud auth application-default login`.
-- Set the active project: `gcloud config set project <PROJECT_ID>`.
-- Ensure the service account running Terraform has `roles/resourcemanager.projectIamAdmin`, `roles/container.admin`, `roles/cloudkms.admin`, `roles/cloudbuild.builds.editor`, and `roles/binaryauthorization.policyEditor`.
-
-## Cloud Build provenance failures
-
-- Confirm that the KMS key specified by `_KMS_KEY` exists and the Cloud Build service account has the `cloudkms.signerVerifier` role.
-- Verify that cosign can access the key: `cosign sign --key ${KMS_KEY} --dry-run IMAGE`.
-- Inspect Cloud Build logs for errors in `generate-provenance` or `generate-sbom` steps.
-
 ## Binary Authorization denials
 
 - Retrieve the denial reason via `gcloud container binauthz verificationalert list`.

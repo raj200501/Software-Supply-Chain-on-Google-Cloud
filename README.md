@@ -131,7 +131,6 @@ make verify IMAGE=us-central1-docker.pkg.dev/$PROJECT/app/users:$(git rev-parse 
 ```
 
 - **Binary Authorization** enforces: only **signed** images with **valid SLSA provenance** can run on GKE.
-- **Continuous Validation** audits running workloads and logs violations.
 
 ---
 
@@ -224,3 +223,62 @@ PRs welcome! Please run `bazel test //...` and `make e2e` before pushing.
 ---
 
 > **Replace `OWNER` in the CI badge URL with your GitHub handle or org.**
+
+---
+
+## 60-second Quickstart
+
+```bash
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements-dev.txt
+scripts/demo.sh
+```
+
+---
+
+## Demo
+
+Run the recruiter-friendly local demo (starts an in-memory gateway, exercises user/order/inventory flow, and prints a report preview):
+
+```bash
+scripts/demo.sh
+```
+
+---
+
+## Verification
+
+Use the single-source verification script (lint + compile + tests + demo smoke):
+
+```bash
+scripts/verify.sh
+```
+
+---
+
+## Features
+
+- Local demo gateway with `/healthz`, `/readyz`, and core `/v1/*` endpoints for users, orders, inventory, metrics, traces, and reports.
+- Policy safety layer (opt-in via `DEMO_POLICY=1`) to gate users/orders with risk classification.
+- Structured logging and timing metrics with optional JSON output (`LOG_FORMAT=json`).
+- Trace recorder with deterministic markdown/JSON exports (`DEMO_TRACE=1`).
+
+---
+
+## Project structure
+
+```
+src/app/lib/packages/supply_chain_demo/   # demo gateway + policy + trace + report toolkit
+scripts/demo.sh                           # one-command demo
+scripts/verify.sh                         # deterministic verification
+scripts/doctor.sh                         # environment diagnostics
+```
+
+---
+
+## Design decisions
+
+- Keep the demo gateway in-process and dependency-free (stdlib only) for deterministic, offline-safe tests.
+- Make safety and observability features opt-in to avoid changing default behavior.
+- Provide a single verification entrypoint to keep CI consistent and easy to run locally.
